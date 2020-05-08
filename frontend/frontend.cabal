@@ -14,6 +14,8 @@ library
                , obelisk-executable-config-lookup
                , obelisk-generated-static
                , text
+               , commonmark
+               , commonmark-extensions
   exposed-modules:
     Frontend
   ghc-options: -Wall
