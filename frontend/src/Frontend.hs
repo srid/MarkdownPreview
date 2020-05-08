@@ -1,4 +1,5 @@
 {-# LANGUAGE DataKinds #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeApplications #-}
 
@@ -31,6 +32,12 @@ frontend = Frontend
   , _frontend_body = do
       el "h1" $ text "Welcome to Obelisk!"
       el "p" $ text $ T.pack commonStuff
+
+      markdown :: Dynamic t T.Text <-
+        fmap value $ textAreaElement $
+          def
+          & textAreaElementConfig_initialValue .~ "Hello *world*"
+          & initialAttributes .~ ("style" =: "width:90%;height:30em;")
       
       -- `prerender` and `prerender_` let you choose a widget to run on the server
       -- during prerendering and a different widget to run on the client with
