@@ -1,4 +1,5 @@
 {-# LANGUAGE DataKinds #-}
+{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeApplications #-}
@@ -34,16 +35,23 @@ frontend :: Frontend (R FrontendRoute)
 frontend = Frontend
   { _frontend_head = do
       el "title" $ text "Obelisk Minimal Example"
-      elAttr "link" ("href" =: static @"main.css" <> "type" =: "text/css" <> "rel" =: "stylesheet") blank
+      -- elAttr "link" ("href" =: static @"main.css" <> "type" =: "text/css" <> "rel" =: "stylesheet") blank
   , _frontend_body = do
       el "h1" $ text "Welcome to Obelisk!"
       el "p" $ text $ T.pack commonStuff
 
-      markdown :: Dynamic t T.Text <-
+      markdownText :: Dynamic t T.Text <-
         fmap value $ textAreaElement $
           def
           & textAreaElementConfig_initialValue .~ "Hello *world*"
-          & initialAttributes .~ ("style" =: "width:90%;height:30em;")
+          & initialAttributes .~ ("style" =: "width:50%;height:15em;")
+
+      result <- eitherDyn $ fmap renderMarkdown  markdownText
+      dyn_ $ ffor result $ \case
+        Left err ->
+          dyn_ $ ffor err $ \_ -> text "Parse error"
+        Right htmlVal ->
+          prerender_ blank $ void $ elDynHtml' "div" $ T.pack . show <$> htmlVal
       
       -- `prerender` and `prerender_` let you choose a widget to run on the server
       -- during prerendering and a different widget to run on the client with
